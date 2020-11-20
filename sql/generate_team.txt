@@ -1,0 +1,11 @@
+CREATE OR REPLACE FUNCTION generate_team_for_tournament(id_tournament  int)
+RETURNS integer
+LANGUAGE SQL
+AS $$
+INSERT INTO public.teams(name, registered_at, tournaments_id)
+VALUES(
+chr(trunc(65 + random() * 25)::int) || chr(trunc(65 + random() * 25)::int),
+(timestamp '2000-01-01' + random() * (timestamp '2030-01-01' - timestamp '2000-01-01')),
+id_tournament)
+RETURNING id
+$$;

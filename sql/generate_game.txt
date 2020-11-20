@@ -1,0 +1,25 @@
+CREATE OR REPLACE FUNCTION generate_game_for_tournament(value_tournaments_id integer)
+RETURNS integer
+LANGUAGE SQL
+AS $$
+WITH 
+source_teams AS
+(SELECT id FROM public.teams 
+WHERE tournaments_id = value_tournaments_id
+ORDER BY random() LIMIT 2),
+
+source_to_insert_game AS
+(SELECT
+(SELECT id FROM source_teams
+LIMIT 1 OFFSET 0) AS teams_id_1, 
+(SELECT id FROM source_teams
+LIMIT 1 OFFSET 1) AS teams_id_2,
+(time '06:00:00' + random() * (time '16:00:00')) AS scheduled_start)
+
+INSERT INTO public.games(teams_id_1, teams_id_2, scheduled_start)
+(SELECT teams_id_1, teams_id_2, scheduled_start FROM source_to_insert_game)
+
+RETURNING id;
+$$;
+
+select generate_game_for_tournament(1)

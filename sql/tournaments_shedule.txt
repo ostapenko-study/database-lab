@@ -1,0 +1,12 @@
+CREATE OR REPLACE FUNCTION tournaments_shedule( tournaments_id integer )
+RETURNS table (id integer, teams_name_1 name, teams_name_2 name, sheduled_start time without time zone)
+LANGUAGE SQL
+AS $$
+		SELECT
+		id, 
+		(select name from teams where id=games.teams_id_1) AS teams_name_1,
+		(select name from teams where id=games.teams_id_2) AS teams_name_2,
+		scheduled_start FROM games
+		WHERE 
+		(select tournaments_id from teams where id=games.teams_id_1) = tournaments_id;
+$$;

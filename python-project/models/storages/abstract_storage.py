@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from benchmark import benchmark
 
 
 class AStorage(ABC):
@@ -7,28 +8,33 @@ class AStorage(ABC):
         self.cursor = cursor
         self.__table_name = table_name
 
-    def getById(self, id: int):
+    @benchmark
+    def get_by_id(self, id: int):
         self.cursor.execute("""
-            SELECT * FROM """ + self.__table_name +"""
+            SELECT * FROM """ + self.__table_name + """
             WHERE id = %s;
             """, (id,))
         return self.cursor.fetchone()
 
-    def getAll(self):
+    @benchmark
+    def get_all(self):
         self.cursor.execute("SELECT * FROM " + self.__table_name + ";")
         return self.cursor.fetchall()
 
+    @benchmark
     def delete(self, id: int):
         self.cursor.execute("""
-            DELETE FROM """ + self.__table_name +"""
+            DELETE FROM """ + self.__table_name + """
             WHERE id = %s;
             """, (id,))
         return self.cursor.rowcount
 
+    @benchmark
     @abstractmethod
     def insert(self, entity):
         pass
 
+    @benchmark
     @abstractmethod
     def update(self, entity):
         pass

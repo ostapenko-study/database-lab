@@ -1,7 +1,7 @@
 # models/storages/participants.py
 
-from models.participant import Participant
-from storages.abstract_storage import AStorage
+from models.entities.participant import Participant
+from models.storages.abstract_storage import AStorage
 
 
 class ParticipantStorage(AStorage):
@@ -22,5 +22,3 @@ class ParticipantStorage(AStorage):
             """, (entity.name, entity.surname, entity.birthday, entity.id))
         return self.cursor.rowcount
 
-    def generate(self, count: int):
-        print('')
