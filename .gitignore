@@ -2,3 +2,6 @@ trash
 lab2/project/venv
 lab2/project/.idea
 lab2/project/__pycache__
+*venv
+*.idea
+*__pycache__

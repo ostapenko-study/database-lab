@@ -1,0 +1,36 @@
+CREATE OR REPLACE FUNCTION log_operation_after()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS
+$$
+DECLARE 
+	type_operation char := '-';
+BEGIN
+
+	IF (TG_OP = 'DELETE') THEN
+		type_operation := 'D';
+	ELSIF (TG_OP = 'UPDATE') THEN
+		type_operation := 'U';
+	ELSIF (TG_OP = 'INSERT') THEN
+		type_operation := 'I';
+	END IF;
+
+INSERT INTO logs (user_name, datatime_event, table_name, operation, comment)
+VALUES (current_user, now(), TG_TABLE_NAME, type_operation, 'no comments');
+
+END;
+$$
+
+
+
+
+CREATE TRIGGER log_teams_after
+
+  AFTER INSERT OR UPDATE
+
+  ON "teams"
+
+  FOR EACH ROW
+
+  EXECUTE PROCEDURE log_operation_after();
+
