@@ -1,3 +1,4 @@
 trash
-python-project/venv
-python-project/.idea
+lab2/project/venv
+lab2/project/.idea
+lab2/project/__pycache__
