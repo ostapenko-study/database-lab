@@ -21,7 +21,7 @@ class Storage:
 
     @benchmark
     def delete(self, id: int):
-        result =  session.\
+        result = session.\
             query(self.instance).\
             filter(self.instance.id == id).\
             delete()
@@ -30,6 +30,7 @@ class Storage:
 
     @benchmark
     def insert(self, entity):
+        entity.id = None
         session.add(entity)
         session.commit()
         return entity.id
