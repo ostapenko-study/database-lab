@@ -1,0 +1,153 @@
+-- FUNCTION: public.generate_tournament()
+
+-- DROP FUNCTION public.generate_tournament();
+
+CREATE OR REPLACE FUNCTION public.generate_tournament(
+	)
+    RETURNS integer
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+INSERT INTO public.tournaments(name, date)
+	VALUES(
+		generate_name((random()*10000)::int % 9 + 1),
+		date(timestamp
+		'2000-01-01' + random() * (timestamp '2031-01-01' - timestamp '2000-01-01'))
+	)
+	RETURNING id;
+$BODY$;
+
+ALTER FUNCTION public.generate_tournament()
+    OWNER TO postgres;
+
+
+
+
+-- FUNCTION: public.generate_team_in_tournament(integer)
+
+-- DROP FUNCTION public.generate_team_in_tournament(integer);
+
+CREATE OR REPLACE FUNCTION public.generate_team_in_tournament(
+	id_tournament integer)
+    RETURNS integer
+    LANGUAGE 'sql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+INSERT INTO public.teams(name, registered_at, tournaments_id)
+VALUES(
+	generate_name((random()*10000)::int % 9 + 1),
+	(timestamp '2000-01-01' + random() * (current_timestamp - timestamp '2000-01-01')),
+	id_tournament)
+RETURNING id
+$BODY$;
+
+ALTER FUNCTION public.generate_team_in_tournament(integer)
+    OWNER TO postgres;
+
+
+
+-- FUNCTION: public.generate_name(integer)
+
+-- DROP FUNCTION public.generate_name(integer);
+
+CREATE OR REPLACE FUNCTION public.generate_name(
+	lenght integer DEFAULT 5)
+    RETURNS name
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+    
+AS $BODY$
+DECLARE 
+			answer varchar(50) default '';
+			rec_char record;
+			cur_char cursor(p_lenght integer)
+					for select chr(trunc(65 + random() * 25)::int) as chr 
+						from generate_series(1, p_lenght);
+BEGIN	
+	open cur_char(lenght);
+	
+	loop
+		
+		fetch cur_char into rec_char;
+		
+		exit when not found;
+		
+		answer := answer || rec_char.chr;
+		
+	end loop;	
+	
+	close cur_char;
+	
+	return answer;
+END;
+$BODY$;
+
+ALTER FUNCTION public.generate_name(integer)
+    OWNER TO postgres;
+
+
+CREATE OR REPLACE FUNCTION public.generate_match_schedule_record_in_tournament(IN value_tournaments_id integer)
+    RETURNS integer
+    LANGUAGE 'sql'
+AS $BODY$
+WITH 
+source_teams AS
+(SELECT id FROM public.teams 
+WHERE tournaments_id = value_tournaments_id
+ORDER BY random() LIMIT 2),
+
+source_to_insert_game AS
+(SELECT
+(SELECT id FROM source_teams
+LIMIT 1 OFFSET 0) AS teams_id_1, 
+(SELECT id FROM source_teams
+LIMIT 1 OFFSET 1) AS teams_id_2,
+(time '06:00:00' + random() * (time '16:00:00')) AS scheduled_start,
+value_tournaments_id)
+
+INSERT INTO public.match_schedule(teams_id_1, teams_id_2, scheduled_start, tournaments_id)
+(SELECT teams_id_1, teams_id_2, scheduled_start, value_tournaments_id FROM source_to_insert_game)
+
+RETURNING id;
+$BODY$;
+
+
+create or replace function teams_statistics_in_tournament(value_tournament_id integer)
+returns table(
+	teams_id int
+	,match_count bigint
+	,played_match bigint
+	,unplayed_match bigint
+	,win_count bigint
+	,draw_count bigint
+	,lose_count bigint
+	,sum_score bigint
+	,max_score int
+	,avg_score numeric
+	,min_score int
+	,match_count_freq numeric
+	,sum_score_freq numeric
+)
+language sql
+as
+$body$
+with t2 as
+(select * from tournaments_statistics
+where tournaments_id=value_tournament_id)
+
+select 
+		t1.*
+		,t1.match_count / (SELECT SUM(t2.match_count) FROM t2) / 2 as match_count_freq
+		,t1.sum_score / (SELECT SUM(t2.sum_score) FROM t2) / 2 as sum_score_freq
+from teams_statistics t1
+where teams_id in (select id from teams where tournaments_id=value_tournament_id)
+$body$
+

@@ -1,0 +1,121 @@
+-- Table: public.match_schedule
+
+-- DROP TABLE public.match_schedule;
+
+CREATE TABLE public.match_schedule
+(
+    id integer NOT NULL,
+    teams_id_1 integer,
+    teams_id_2 integer,
+    scheduled_start timestamp without time zone,
+    tournaments_id integer,
+    CONSTRAINT match_schedule_pkey PRIMARY KEY (id),
+    CONSTRAINT match_schedule_teams_id_1_fkey FOREIGN KEY (teams_id_1)
+        REFERENCES public.teams (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT match_schedule_teams_id_2_fkey FOREIGN KEY (teams_id_2)
+        REFERENCES public.teams (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT match_schedule_tournaments_id_fkey FOREIGN KEY (tournaments_id)
+        REFERENCES public.tournaments (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.match_schedule
+    OWNER to postgres;
+
+
+
+
+-- Table: public.match_results
+
+-- DROP TABLE public.match_results;
+
+CREATE TABLE public.match_results
+(
+    match_schedule_id integer NOT NULL,
+    start_time timestamp without time zone,
+    end_time timestamp without time zone,
+    points_1 integer,
+    points_2 integer,
+    CONSTRAINT match_results_pkey PRIMARY KEY (match_schedule_id),
+    CONSTRAINT match_results_match_schedule_id_fkey FOREIGN KEY (match_schedule_id)
+        REFERENCES public.match_schedule (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.match_results
+
+
+
+
+-- Table: public.playgrounds
+
+-- DROP TABLE public.playgrounds;
+
+CREATE TABLE public.playgrounds
+(
+    id integer NOT NULL,
+    name character varying COLLATE pg_catalog."default",
+    tournaments_id integer,
+    CONSTRAINT playgrounds_pkey PRIMARY KEY (id),
+    CONSTRAINT playgrounds_tournaments_id_fkey FOREIGN KEY (tournaments_id)
+        REFERENCES public.tournaments (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.playgrounds
+    OWNER to postgres;
+    OWNER to postgres;
+
+
+-- Table: public.teams
+
+-- DROP TABLE public.teams;
+
+CREATE TABLE public.teams
+(
+    id integer NOT NULL,
+    name character varying COLLATE pg_catalog."default",
+    tournaments_id integer,
+    registered_at timestamp without time zone,
+    CONSTRAINT teams_pkey PRIMARY KEY (id),
+    CONSTRAINT teams_tournaments_id_fkey FOREIGN KEY (tournaments_id)
+        REFERENCES public.tournaments (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.teams
+    OWNER to postgres;
+
+
+-- Table: public.tournaments
+
+-- DROP TABLE public.tournaments;
+
+CREATE TABLE public.tournaments
+(
+    id integer NOT NULL DEFAULT nextval('tournaments_id_seq'::regclass),
+    name character varying COLLATE pg_catalog."default",
+    date date,
+    CONSTRAINT tournaments_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.tournaments
+    OWNER to postgres;
