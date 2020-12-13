@@ -10,14 +10,18 @@ class SearchStorage(object):
     @benchmark
     def get_statistic_tournaments(self):
         self.__cursor.execute(
-                'select * from tournaments_statistics'
+                'select * from tournaments '
+                'inner join tournaments_statistics '
+                'on tournaments.id=tournaments_statistics.tournaments_id '
         )
         return self.__cursor.fetchall(), [desc[0] for desc in self.__cursor.description]
 
     @benchmark
     def get_statistic_teams_in_tournament(self, _id: int):
         self.__cursor.execute(
-                f'select * from teams_statistics_in_tournament({_id})'
+                f'select * from teams '
+                f'inner join teams_statistics_in_tournament({_id}) as t '
+                f'on teams.id = t.teams_id'
         )
         return self.__cursor.fetchall(), [desc[0] for desc in self.__cursor.description]
 

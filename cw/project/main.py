@@ -12,6 +12,8 @@ from models.storages.generate import GenerateStorage
 from controllers.search import SearchController
 from models.storages.search import SearchStorage
 
+import matplotlib.pyplot as plt
+
 if __name__ == '__main__':
     conn = psycopg2.connect(dbname=Config.db_name, user=Config.user,
                             password=Config.passwd, host='localhost')

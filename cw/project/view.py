@@ -66,3 +66,16 @@ def enter_time():
         except Exception as e:
             print('entered value is not time', e)
             continue
+
+
+def choose_output():
+    print('Enter type of display: \n\'png\' to chart or any for console output')
+    command = input()
+    return command == 'png'
+
+
+def choose_command(commands):
+    print('print a number of command')
+    for i in range(len(commands)):
+        print(f'{i}. {commands[i]}')
+    return enter_integer(0, len(commands)-1)
