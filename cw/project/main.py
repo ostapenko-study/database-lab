@@ -1,29 +1,11 @@
-from db import session
-from db import create_database
-from models.entities.tournament import Tournament
-from models.entities.team import Team
-from models.entities.match_results import MatchResults
-from models.entities.match_schedule import MatchSchedule
-from models.entities.playground import Playground
-import psycopg2
-from config import Config
-from controllers.generate import GenerateController
-from models.storages.generate import GenerateStorage
-from controllers.search import SearchController
-from models.storages.search import SearchStorage
+from database import Database
+from controllers.controller import Controller
 
-import matplotlib.pyplot as plt
+database = Database()
 
-if __name__ == '__main__':
-    conn = psycopg2.connect(dbname=Config.db_name, user=Config.user,
-                            password=Config.passwd, host='localhost')
+controller = Controller(database)
 
-    cursor = conn.cursor()
-    storage = SearchStorage(cursor)
-    controller = SearchController(storage)
+controller.loop()
 
-    controller.loop()
-
-    cursor.close()
-    conn.commit()
-    conn.close()
+# for i in range(1, 5):
+#     database.generate.generate_tournament(i*1000, i*100, i*2000, i*1000)

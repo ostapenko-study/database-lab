@@ -1,4 +1,3 @@
-import datetime
 from sqlalchemy import Column, Integer, DateTime, Sequence, ForeignKey, String
 from db import Base
 

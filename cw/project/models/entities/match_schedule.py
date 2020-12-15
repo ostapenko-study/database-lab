@@ -15,9 +15,10 @@ class MatchSchedule(Base):
 
     def __init__(self, teams_id_1: int, teams_id_2: int,
                  scheduled_start: datetime.datetime,
-                 playgrounds_id: int, id: int = None):
+                 playgrounds_id: int, tournaments_id: int, id: int = None):
         self.teams_id_1 = teams_id_1
         self.teams_id_2 = teams_id_2
         self.scheduled_start = scheduled_start
         self.playgrounds_id = playgrounds_id
+        self.tournaments_id = tournaments_id
         self.id = id

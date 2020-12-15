@@ -58,6 +58,7 @@ class SearchController(AController):
             temp_str = f'statistic_tournaments_{colnames[field]}_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}'
             plt.title(temp_str)
             plt.savefig(temp_str)
+            print(f'file \'{temp_str}\' created')
         else:
             print(colnames)
             View.print_collection_with_verify(items)
@@ -111,6 +112,8 @@ class SearchController(AController):
                 temp_str = f'statistic_teams_in_tournament_{tournaments_id}_{commands[commands_id]}_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}'
                 plt.title(temp_str)
                 plt.savefig(temp_str)
+
+                print(f'file \'{temp_str}\' created')
         else:
             print(colnames)
             View.print_collection_with_verify(items)
