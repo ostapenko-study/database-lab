@@ -16,11 +16,16 @@ def print_collection_with_verify(items):
         print('no find')
 
 
+def choose_yes():
+    print('(\'yes\'/any)')
+    answer = input()
+    return answer == 'yes'
+
+
 def print_collection(items):
     print('list ({} elements): '.format(len(items), ))
-    print('print collection? (\'yes\'/any)')
-    answer = input()
-    if answer == 'yes':
+    print('print collection?')
+    if choose_yes():
         for item in items:
             print(item)
     else:

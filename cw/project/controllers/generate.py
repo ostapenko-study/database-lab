@@ -28,12 +28,20 @@ class GenerateController(AController):
         print('Enter count of played games:')
         count_results = View.enter_integer()
         arrays = self.generate_storage.generate_tournament(count_teams, count_playgrounds, count_games, count_results)
+        print("print ID?")
+        if View.choose_yes():
+            print(f'tournaments ID: {arrays[0]}')
+            print('IDs of teams:')
+            print(arrays[1])
+            print('IDs of playgrounds:')
+            print(arrays[2])
+            print('IDs of games:')
+            print(arrays[3])
+        else:
+            print('good choice')
 
-        print('tournaments ID:')
-        View.print_collection(arrays[0])
-        print('IDs of teams:')
-        View.print_collection(arrays[1])
-        print('IDs of playgrounds:')
-        View.print_collection(arrays[2])
-        print('IDs of games:')
-        View.print_collection(arrays[3])
+        print('commit (\'yes\') or rollback:')
+        if View.choose_yes():
+            self.generate_storage.commit()
+        else:
+            self.generate_storage.rollback()

@@ -3,8 +3,9 @@ from benchmark import benchmark
 
 class GenerateStorage(object):
 
-    def __init__(self, cursor):
-        self.__cursor = cursor
+    def __init__(self, conn):
+        self.__conn = conn
+        self.__cursor = conn.cursor()
 
     @benchmark
     def generate_tournament(self, count_teams: int, count_playground: int, count_games: int, count_results: int):
@@ -44,3 +45,10 @@ class GenerateStorage(object):
     def __match_results_generate_in_tournament(self, tournament_id: int):
         self.__cursor.callproc('public.generate_match_results_record_in_tournament', (tournament_id, ))
         return self.__cursor.fetchall()[0]
+
+    def commit(self):
+        self.__conn.commit()
+
+    def rollback(self):
+        self.__conn.rollback()
+

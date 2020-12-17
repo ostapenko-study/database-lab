@@ -1,5 +1,5 @@
 from database import Database
-from controllers.storage_controller import StorageController
+from controllers.storage import StorageController
 from models.entities.tournament import Tournament
 from models.entities.team import Team
 from controllers.abstract import AController
@@ -16,7 +16,7 @@ class Controller(AController):
             StorageController(database.tournaments, lambda: Tournament.input_from_console(), 'tournaments'),
             StorageController(database.teams, lambda: Team.input_from_console(), 'teams'),
             SearchController(database.searches),
-            GenerateController(database.generate)
+            GenerateController(database.generate),
         ]
 
     def execute_method(self, command_id: int):

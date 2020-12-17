@@ -20,7 +20,7 @@ class Database(object):
         self.teams = StorageEntity(Team)
 
         self.searches = SearchStorage(self.__cursor)
-        self.generate = GenerateStorage(self.__cursor)
+        self.generate = GenerateStorage(self.__conn)
 
     @benchmark
     def __del__(self):
