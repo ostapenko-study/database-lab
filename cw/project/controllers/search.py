@@ -14,13 +14,17 @@ class SearchController(AController):
                             'get_statistic_tournaments',
                             'get_statistic_teams_in_tournament',
                             'tournaments_schedule',
-                            'tournaments_schedule_in_time_range'
+                            'tournaments_schedule_in_time_range',
+                            'schedule_for_team',
+                            'schedule_for_playground',
                         ] + self.commands
         self.methods = [
             self.__get_statistic_tournaments,
             self.__get_statistic_teams_in_tournament,
             self.__tournaments_schedule,
             self.__tournaments_schedule_in_time_range,
+            self.__schedule_for_team,
+            self.__schedule_for_playground,
         ]
         self.search_storage = search_storage
 
@@ -47,12 +51,10 @@ class SearchController(AController):
                 labels.pop(i - count)
                 count += 1
 
-            explode = [0.1 for row in labels]
-
             fig, ax = plt.subplots()
-            fig.set_size_inches(18.5, 10.5, forward=True)
-            ax.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
-                    shadow=True, startangle=90)
+            fig.set_size_inches(10.5, 10.5, forward=True)
+            ax.pie(sizes, labels=labels, autopct='%1.1f%%',
+                   shadow=True, startangle=90)
             ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
             temp_str = f'statistic_tournaments_{colnames[field]}_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}'
@@ -68,6 +70,11 @@ class SearchController(AController):
         tournaments_id = View.enter_integer()
         items, colnames = self.search_storage.get_statistic_teams_in_tournament(tournaments_id)
         if View.choose_output():
+            per_page = 10
+            count = len(items)
+            print(f'There are {count} teams, choose page from 0 to {int(count/per_page)}:')
+            page = View.enter_integer(0, count/per_page)
+            items = items[page*per_page:min(count-1, per_page*(page+1))]
             index_of_name = colnames.index('name')
             labels = [row[index_of_name] for row in items]
             for i in range(0, len(labels)):
@@ -75,6 +82,7 @@ class SearchController(AController):
                     labels[i] = labels[i][:3] + '..'
             commands = ['matches info', 'results info']
             commands_id = View.choose_command(commands)
+
             if commands_id == 0:
                 played_matches = [row[colnames.index('played_match')] for row in items]
                 matches_count = [row[colnames.index('match_count')] for row in items]
@@ -84,16 +92,16 @@ class SearchController(AController):
                     if matches_count[i] is None:
                         matches_count[i] = 0
                 fig, ax = plt.subplots()
-                fig.set_size_inches(18.5, 10.5, forward=True)
                 ax.bar(labels, matches_count)
                 ax.bar(labels, played_matches)
                 ax.set_facecolor('seashell')
                 fig.set_facecolor('floralwhite')
 
                 plt.xlabel('orange - played_matches; blue - unplayed_matches;')
-                temp_str = f'statistic_teams_in_tournament_{tournaments_id}_{commands[commands_id]}_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}'
+                temp_str = f'statistic_teams_in_tournament_{tournaments_id}_page{page}_{commands[commands_id]}_{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}'
                 plt.title(temp_str)
                 plt.savefig(temp_str)
+                print(f'file \'{temp_str}\' created')
             if commands_id == 1:
                 wins = [row[colnames.index('win_count')] for row in items]
                 self.____null_to_0(wins)
@@ -133,6 +141,20 @@ class SearchController(AController):
         print('Enter time end:')
         time_end = View.enter_time()
         items, colnames = self.search_storage.tournaments_schedule_in_time_range(id, time_begin, time_end)
+        print(colnames)
+        View.print_collection_with_verify(items)
+
+    def __schedule_for_team(self):
+        print('Enter teams_id:')
+        id = View.enter_integer()
+        items, colnames = self.search_storage.schedule_for_team(id)
+        print(colnames)
+        View.print_collection_with_verify(items)
+
+    def __schedule_for_playground(self):
+        print('Enter playgrounds_id:')
+        id = View.enter_integer()
+        items, colnames = self.search_storage.schedule_for_playground(id)
         print(colnames)
         View.print_collection_with_verify(items)
 
